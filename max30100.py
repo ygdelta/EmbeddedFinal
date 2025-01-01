@@ -118,3 +118,4 @@ if __name__ == "__main__":
             print(f"\r心率: {hr:3d} BPM | 血氧: {o2:3d}%", end="")
             time.sleep(0.01)
     except KeyboardInterrupt:
+        print("\n程式結束")
