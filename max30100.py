@@ -1,3 +1,4 @@
+from threading import Thread, Lock
 import smbus2
 import time
 import numpy as np
@@ -12,8 +13,14 @@ class MAX30100:
         self.ir_buffer = deque(maxlen=self.buffer_size)
         self.red_buffer = deque(maxlen=self.buffer_size)
         self.time_buffer = deque(maxlen=self.buffer_size)
-        self._is_initialized = False
         
+        # 執行緒安全的數據存儲
+        self._lock = Lock()
+        self._current_hr = 0
+        self._current_spo2 = 0
+        self._running = False
+        self._thread = None
+    
     def begin(self):
         try:
             # 重置感測器
@@ -25,31 +32,43 @@ class MAX30100:
             self.bus.write_byte_data(self.address, 0x07, 0x47)  # SpO2 設定
             self.bus.write_byte_data(self.address, 0x09, 0x24)  # LED 電流
             
-            self._is_initialized = True
+            # 啟動讀取執行緒
+            self._running = True
+            self._thread = Thread(target=self._update_thread, daemon=True)
+            self._thread.start()
+            
             return True
         except Exception as e:
             print(f"初始化失敗: {e}")
             return False
     
-    def update(self):
-        if not self._is_initialized:
-            return False
-            
-        try:
-            data = self.bus.read_i2c_block_data(self.address, 0x05, 4)
-            ir = (data[0] << 8) | data[1]
-            red = (data[2] << 8) | data[3]
-            
-            if ir > 1000 and red > 1000:
-                self.ir_buffer.append(ir)
-                self.red_buffer.append(red)
-                self.time_buffer.append(time.time())
-            
-            return True
-        except:
-            return False
+    def _update_thread(self):
+        """持續讀取和更新數據的執行緒"""
+        while self._running:
+            try:
+                # 讀取數據
+                data = self.bus.read_i2c_block_data(self.address, 0x05, 4)
+                ir = (data[0] << 8) | data[1]
+                red = (data[2] << 8) | data[3]
+                
+                if ir > 1000 and red > 1000:
+                    with self._lock:
+                        self.ir_buffer.append(ir)
+                        self.red_buffer.append(red)
+                        self.time_buffer.append(time.time())
+                        
+                        # 更新心率和血氧
+                        self._current_hr = self._calculate_hr()
+                        self._current_spo2 = self._calculate_spo2()
+                
+                time.sleep(0.01)  # 100Hz 採樣率
+                
+            except Exception as e:
+                print(f"讀取錯誤: {e}")
+                time.sleep(0.1)
     
-    def heart_rate(self):
+    def _calculate_hr(self):
+        """內部心率計算方法"""
         if len(self.ir_buffer) < 100:
             return 0
             
@@ -74,7 +93,8 @@ class MAX30100:
         
         return 0
     
-    def spo2(self):
+    def _calculate_spo2(self):
+        """內部血氧計算方法"""
         if len(self.ir_buffer) < 100:
             return 0
             
@@ -97,6 +117,22 @@ class MAX30100:
         spo2 = 110 - 25 * r
         
         return int(min(100, max(80, spo2)))
+    
+    def heart_rate(self):
+        """取得當前心率"""
+        with self._lock:
+            return self._current_hr
+    
+    def spo2(self):
+        """取得當前血氧值"""
+        with self._lock:
+            return self._current_spo2
+    
+    def stop(self):
+        """停止感測器讀取"""
+        self._running = False
+        if self._thread:
+            self._thread.join()
 
 # 使用範例
 if __name__ == "__main__":
@@ -112,10 +148,10 @@ if __name__ == "__main__":
     
     try:
         while True:
-            sensor.update()
             hr = sensor.heart_rate()
             o2 = sensor.spo2()
             print(f"\r心率: {hr:3d} BPM | 血氧: {o2:3d}%", end="")
-            time.sleep(0.01)
+            time.sleep(0.1)
     except KeyboardInterrupt:
+        sensor.stop()
         print("\n程式結束")
