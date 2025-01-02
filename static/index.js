@@ -1,16 +1,16 @@
 $(document).ready(function() {
-  setInterval(function() {
+  setInterval(() => {
     $.ajax({
       url: 'http://127.0.0.1:5000/max30100',
       type: 'GET',
       success: function(response) {
-        $('#heart_rate').text('Heart rate: ' + response.heart_rate);
+        $('#heart').text('Heart rate: ' + response.heart_rate);
         $('#spo2').text('SpO2: ' + response.spo2);
       }
     })
   }, 2000);
 
-  setInterval(function() {
+  setInterval(() => {
     $.ajax({
       url: 'http://127.0.0.1:5000/ds18b20',
       type: 'GET',
@@ -20,7 +20,7 @@ $(document).ready(function() {
     });
   }, 2000);
 
-  setInterval(function() {
+  setInterval(() => {
     $.ajax({
       url: 'http://127.0.0.1:5000/mpu6050',
       type: 'GET',
