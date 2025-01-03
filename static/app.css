@@ -51,10 +51,49 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
+	background-color: #2d2176;
 }
 
 .board {
     width: fit-content;
-    height: fit-content;
-    background-color:aquamarine;
+    height: 40%;
+	display: flex;
 }
+
+.card {
+	display: flex;
+	flex-direction: column;
+	width: 210px;
+	height: 280px;
+    background-color: #543fd3;
+	padding: 15px;
+	margin: 10px;
+	font-size: 40px;
+	color: #ffffff;
+	opacity: 80%;
+	border-radius: 10px;
+	font-weight: bold;
+	font-family:'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+}
+
+div.value {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	width: 100%;
+	height: 100%;
+}
+
+p.title {
+	font-weight: lighter;
+	font-size: 20px;
+}
+
+p.unit {
+	font-size: 20px;
+	text-align: right;
+}
+/* div.heart-field, div.temp-field, div.state-field {
+	display: flex;
+	width: fit-content;
+} */

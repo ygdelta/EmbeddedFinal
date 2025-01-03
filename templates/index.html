@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Home</title>
     <link rel="stylesheet" href="../static/app.css">
     <script
   src="https://code.jquery.com/jquery-3.7.1.js"
@@ -12,17 +12,34 @@
 </head>
 <body>
   <div class="board">
-    <div>
-      <p id="heart">Heart rate: </p> 
-      <p id="spo2">SpO2: </p>
+    <div class="card">
+      <p class="title">Heart rate: </p> 
+      <div class="value">
+        <p id="heart">Waiting</p>
+      </div>
+      <p class="unit">bpm</p>
     </div>
-    <div>
-      <p id="temp">Temperature: </p> 
+    <div class="card">
+      <p class="title">SpO2: </p>
+      <div class="value">
+        <p id="spo2">None</p>
+      </div>
+      <p class="unit">mmHg</p>
     </div>
-    <div>
-      <p id="state">State: </p>
-      <p id="accel"></p>
+    <div class="card">
+      <p class="title">Temperature: </p> 
+      <div class="value">
+        <p id="temp">None</p>
+      </div>
+      <p class="unit">℃</p>
     </div>
+    <div class="card">
+      <p class="title">State: </p>
+      <div class="value">
+        <p id="state">None</p>
+      </div>
+    </div>
+    <p id="accel"></p>
   </div>
 </body>
 <script src="../static/index.js"></script>

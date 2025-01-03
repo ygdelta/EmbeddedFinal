@@ -14,7 +14,6 @@ class MAX30100:
         self.red_buffer = deque(maxlen=self.buffer_size)
         self.time_buffer = deque(maxlen=self.buffer_size)
         
-        # 執行緒安全的數據存儲
         self._lock = Lock()
         self._current_hr = 0
         self._current_spo2 = 0
@@ -23,16 +22,13 @@ class MAX30100:
     
     def begin(self):
         try:
-            # 重置感測器
             self.bus.write_byte_data(self.address, 0x06, 0x40)
             time.sleep(0.1)
             
-            # 設定工作模式
             self.bus.write_byte_data(self.address, 0x06, 0x03)  # HR + SpO2
             self.bus.write_byte_data(self.address, 0x07, 0x47)  # SpO2 設定
             self.bus.write_byte_data(self.address, 0x09, 0x24)  # LED 電流
             
-            # 啟動讀取執行緒
             self._running = True
             self._thread = Thread(target=self._update_thread, daemon=True)
             self._thread.start()
@@ -43,10 +39,8 @@ class MAX30100:
             return False
     
     def _update_thread(self):
-        """持續讀取和更新數據的執行緒"""
         while self._running:
             try:
-                # 讀取數據
                 data = self.bus.read_i2c_block_data(self.address, 0x05, 4)
                 ir = (data[0] << 8) | data[1]
                 red = (data[2] << 8) | data[3]
@@ -68,10 +62,8 @@ class MAX30100:
                 time.sleep(0.1)
     
     def _calculate_hr(self):
-        """內部心率計算方法"""
         if len(self.ir_buffer) < 100:
             return 0
-            
         ir_data = np.array(list(self.ir_buffer))
         normalized_data = (ir_data - np.mean(ir_data)) / np.std(ir_data)
         
@@ -94,7 +86,6 @@ class MAX30100:
         return 0
     
     def _calculate_spo2(self):
-        """內部血氧計算方法"""
         if len(self.ir_buffer) < 100:
             return 0
             
@@ -119,22 +110,18 @@ class MAX30100:
         return int(min(100, max(80, spo2)))
     
     def heart_rate(self):
-        """取得當前心率"""
         with self._lock:
             return self._current_hr
     
     def spo2(self):
-        """取得當前血氧值"""
         with self._lock:
             return self._current_spo2
     
     def stop(self):
-        """停止感測器讀取"""
         self._running = False
         if self._thread:
             self._thread.join()
 
-# 使用範例
 if __name__ == "__main__":
     sensor = MAX30100()
     
