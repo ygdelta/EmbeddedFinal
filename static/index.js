@@ -45,7 +45,7 @@ $(document).ready(() => {
   }, 3000);
 
   let CheckBPM = (bpm) => {
-    if ( !typeof bpm === 'number' ) {
+    if ( !(typeof bpm === 'number') ) {
       $('#heart').text('Waiting');
       return;
     }
@@ -58,7 +58,7 @@ $(document).ready(() => {
   }
 
   let CheckO2 = (spo2) => {
-    if ( !typeof spo2 === 'number' ) {
+    if ( !(typeof spo2 === 'number') ) {
       $('#spo2').text('Waiting');
       return;
     }
@@ -71,7 +71,7 @@ $(document).ready(() => {
   }
 
   let CheckTemp = (temp) => {
-    if ( !typeof temp === 'number' ) {
+    if ( !(typeof temp === 'number') ) {
       $('#temp').text('None');
       return;
     }
