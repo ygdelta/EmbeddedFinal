@@ -1,48 +1,4 @@
 $(document).ready(() => {
-  setInterval(() => {
-    $.ajax({
-      url: 'http://127.0.0.1:5000/max30100',
-      type: 'GET',
-      success: (response) => {
-        heart = response.heart_rate;
-        spo2 = response.spo2;
-        CheckBPM(heart);
-        CheckO2(spo2);
-      },
-      error: (err) => {
-        $('#heart').text('Waiting');
-        $('#spo2').text('None');
-      }
-    })
-  }, 3000);
-
-  setInterval(() => {
-    $.ajax({
-      url: 'http://127.0.0.1:5000/ds18b20',
-      type: 'GET',
-      success: (res) => {
-        CheckTemp(res.temperature);
-      },
-      error: (err) => {
-        $('#temp').text('None');
-      }
-    });
-  }, 3000);
-
-  setInterval(() => {
-    $.ajax({
-      url: 'http://127.0.0.1:5000/mpu6050',
-      type: 'GET',
-      success: function(res) {
-        let tmp = res;
-        CheckState(tmp.status);
-        $('#accel').text('x:' + tmp.x + ', y: ' + tmp.y + ', z: ' + tmp.z);
-      },
-      error: (err) => {
-        $('#state').text('None');
-      }
-    });
-  }, 3000);
 
   let CheckBPM = (bpm) => {
     if ( !(typeof bpm === 'number') ) {
@@ -56,6 +12,23 @@ $(document).ready(() => {
     else {
       $('#heart').css('color', 'white');
     }
+  }
+
+  $('#start').on('click', () => {
+    start = true;
+    Test();
+    buttonState();
+  });
+
+  $('#stop').on('click', () => {
+    start = false;
+    Test();
+    buttonState();
+  });
+
+  let buttonState = () => {
+    $('#start').prop('disabled', start);
+    $('#stop').prop('disabled', !start);
   }
 
   let CheckO2 = (spo2) => {
@@ -96,5 +69,57 @@ $(document).ready(() => {
       $('#state').css('color', 'white');
     }
   }
+  
+
+  // Main
+  let start = false;
+  buttonState();
+  let Test = () => {
+    let interval = setInterval(() => {
+      if ( !start ) {
+        clearInterval(interval);
+      }
+      $.ajax({
+        url: 'http://127.0.0.1:5000/max30100',
+        type: 'GET',
+        success: (response) => {
+          heart = response.heart_rate;
+          spo2 = response.spo2;
+          CheckBPM(heart);
+          CheckO2(spo2);
+        },
+        error: (err) => {
+          $('#heart').text('Waiting');
+          $('#spo2').text('None');
+        }
+      });
+
+      $.ajax({
+        url: 'http://127.0.0.1:5000/ds18b20',
+        type: 'GET',
+        success: (res) => {
+          CheckTemp(res.temperature);
+        },
+        error: (err) => {
+          $('#temp').text('None');
+        }
+      });
+
+      $.ajax({
+        url: 'http://127.0.0.1:5000/mpu6050',
+        type: 'GET',
+        success: function(res) {
+          let tmp = res;
+          CheckState(tmp.status);
+          $('#accel').text('x:' + tmp.x + ', y: ' + tmp.y + ', z: ' + tmp.z);
+        },
+        error: (err) => {
+          $('#state').text('None');
+        }
+      });
+    }, 3000);
+  }
+
+
 });
 
