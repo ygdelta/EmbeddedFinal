@@ -34,9 +34,9 @@ $(document).ready(() => {
       url: 'http://127.0.0.1:5000/mpu6050',
       type: 'GET',
       success: function(res) {
-        let res = res;
-        CheckState(res.status);
-        $('#accel').text('x:' + res.x + ', y: ' + res.y + ', z: ' + res.z);
+        let tmp = res;
+        CheckState(tmp.status);
+        $('#accel').text('x:' + tmp.x + ', y: ' + tmp.y + ', z: ' + tmp.z);
       },
       error: (err) => {
         $('#state').text('None');
