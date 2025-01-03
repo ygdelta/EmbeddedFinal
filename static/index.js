@@ -49,6 +49,7 @@ $(document).ready(() => {
       $('#heart').text('Waiting');
       return;
     }
+    $('#heart').text(bpm);
     if ( bpm > 150 || bpm < 40 ) {
       $('#heart').css('color', 'red');
     }
@@ -62,6 +63,7 @@ $(document).ready(() => {
       $('#spo2').text('Waiting');
       return;
     }
+    $('#spo2').text(spo2);
     if ( spo2 < 95 ) {
       $('#spo2').css('color', 'red');
     }
@@ -75,6 +77,7 @@ $(document).ready(() => {
       $('#temp').text('None');
       return;
     }
+    $('#temp').text(temp);
     if ( temp < 35 || temp > 37.5 ) {
       $('#temp').css('color', 'red');
     }
