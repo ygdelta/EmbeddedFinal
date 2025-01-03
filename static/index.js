@@ -1,4 +1,4 @@
-$(document).ready(function() {
+$(document).ready(() => {
   setInterval(() => {
     $.ajax({
       url: 'http://127.0.0.1:5000/max30100',
@@ -12,7 +12,7 @@ $(document).ready(function() {
         $('#spo2').text('None');
       }
     })
-  }, 2000);
+  }, 3000);
 
   setInterval(() => {
     $.ajax({
@@ -25,7 +25,7 @@ $(document).ready(function() {
         $('#temp').text('None');
       }
     });
-  }, 2000);
+  }, 3000);
 
   setInterval(() => {
     $.ajax({
@@ -39,7 +39,7 @@ $(document).ready(function() {
         $('#state').text('None');
       }
     });
-  }, 2000);
+  }, 3000);
 });
 
 let CheckBPM = (bpm) => {
@@ -52,6 +52,10 @@ let CheckBPM = (bpm) => {
 }
 
 let CheckO2 = (spo2) => {
+  if ( !typeof spo2 === 'number' ) {
+    $('#spo2').text('None');
+    return;
+  }
   if ( spo2 < 95 ) {
     $('#spo2').css('color', 'red');
   }
@@ -61,6 +65,10 @@ let CheckO2 = (spo2) => {
 }
 
 let CheckTemp = (temp) => {
+  if ( !typeof temp === 'number' ) {
+    $('#temp').text('None');
+    return;
+  }
   if ( temp < 35 || temp > 37.5 ) {
     $('#temp').css('color', 'red');
   }

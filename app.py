@@ -39,7 +39,7 @@ def getMPU6050():
   x = accel_data['x']
   y = accel_data['y']
   z = accel_data['z']
-  if abs(x) > 10 and abs(y) > 10 and abs(z) > 10:
+  if abs(z) > 5:
     status = 'danger'
   res = jsonify({
     'x': x,
